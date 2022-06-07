@@ -6,6 +6,7 @@ import visibilityIcon from '../assets/svg/visibilityIcon.svg';
 
 // FIREBASE
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import OAuth from '../components/OAuth';
 
 function Signin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -80,17 +81,19 @@ function Signin() {
             </Link>
 
             <div className="signInBar">
-              <p className="singInText">Sign In</p>
+              <p className="signInText">Sign In</p>
               <button className="signInButton">
                 <ArrowRightIcon fill="#fff" width="34px" height="34px" />
               </button>
             </div>
-
-            {/* Google OAuth */}
-            <Link to="/sign-up" className="registerLink">
-              Sign up
-            </Link>
           </form>
+
+          {/* Google OAuth */}
+          <OAuth />
+
+          <Link to="/sign-up" className="registerLink">
+            Sign up instead
+          </Link>
         </main>
       </div>
     </>
