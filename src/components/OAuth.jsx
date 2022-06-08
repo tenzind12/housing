@@ -10,6 +10,7 @@ const OAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // loggin in Google Account
   const onGoogleClick = async () => {
     try {
       const auth = getAuth();
@@ -20,7 +21,7 @@ const OAuth = () => {
       //   Check for user
       const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
-      // If user doesnt exists, create user
+      // If user doesn't exists, create user
       if (!docSnap.exists()) {
         await setDoc(doc(db, 'users', user.uid), {
           name: user.displayName,
