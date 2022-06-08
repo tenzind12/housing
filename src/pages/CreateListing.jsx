@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
+import { toast } from 'react-toastify';
 
 const CreateListing = () => {
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true);
+  const [geolocationEnabled, setGeolocationEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     type: 'rent',
@@ -14,7 +15,7 @@ const CreateListing = () => {
     parking: false,
     furnished: false,
     address: '',
-    offer: false,
+    offer: true,
     regularPrice: 0,
     discountedPrice: 0,
     images: {},
@@ -41,12 +42,62 @@ const CreateListing = () => {
   }, [auth, isMounted, navigate]);
 
   // form submit Handler
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData.images[0].name);
+    setLoading(true);
+
+    // error price
+    if (parseFloat(discountedPrice) >= parseFloat(regularPrice)) {
+      setLoading(false);
+      toast.error('The discounted price cannot be bigger than regular price');
+      return;
+    }
+
+    // maximum images
+    if (images.length > 6) {
+      setLoading(false);
+      toast.error('Max 6 images');
+      return;
+    }
+
+    // geolocation
+    let geolocation = {};
+    let location;
+
+    if (geolocationEnabled) {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GEOCODE_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (!data.status === 'REQUEST_DENIED') {
+        // if no lat and lng available, make them 0
+        geolocation.lat = data.result[0]?.geometry.location.lat ?? 0;
+        geolocation.lng = data.result[0]?.geometry.location.lng ?? 0;
+
+        // when user enters invalid address field
+        location = data.status === 'ZERO_RESULTS' ? undefined : data.results[0]?.formatted_address;
+
+        if (location === undefined || location.includes('undefined')) {
+          setLoading(false);
+          toast.error('Please enter a correct address');
+        }
+      } else {
+        toast.error(
+          'The api key is currently having issues. Please enter latitude and longitude manually'
+        );
+      }
+    } else {
+      geolocation.lat = latitude;
+      geolocation.lng = longitude;
+      location = address;
+
+      console.log(location);
+    }
+    setLoading(false);
   };
 
-  // onChange input fields
+  // === onChange input fields
   const onMutate = (e) => {
     // turning the string 'true' & 'false' into type boolean
     let boolean = null;
