@@ -68,7 +68,7 @@ const CreateListing = () => {
     let geolocation = {};
     let location;
 
-    // if block for geolocation handling
+    // IF BLOCK for geolocation handling
     if (geolocationEnabled) {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GEOCODE_API_KEY}`
@@ -95,7 +95,6 @@ const CreateListing = () => {
     } else {
       geolocation.lat = latitude;
       geolocation.lng = longitude;
-      location = address;
     }
 
     // Store images in firebase
@@ -154,9 +153,10 @@ const CreateListing = () => {
       timestamp: serverTimestamp(),
     };
 
+    formDataCopy.location = address;
     delete formDataCopy.images;
     delete formDataCopy.address;
-    location && (formDataCopy.location = location);
+
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
 
     const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
