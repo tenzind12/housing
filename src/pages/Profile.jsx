@@ -103,6 +103,9 @@ function Profile() {
     toast.success('Listing has been deleted !');
   };
 
+  // Edit handler navigate
+  const onEdit = (listingId) => navigate(`/edit-listing/${listingId}`);
+
   return (
     <div className="profile">
       <header className="profileHeader">
@@ -168,6 +171,7 @@ function Profile() {
                 id={listing.id}
                 key={listing.id}
                 onDelete={() => onDelete(listing.id)}
+                onEdit={() => onEdit(listing.id)}
               />
             ))}
           </ul>
