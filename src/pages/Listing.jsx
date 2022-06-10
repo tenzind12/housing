@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import SwiperCore, { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
 import { getDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../firebase.config';
@@ -15,6 +21,7 @@ const Listing = () => {
   const navigate = useNavigate();
   const params = useParams();
   const auth = getAuth();
+  console.log(listing);
 
   // Fetching data from firestore
   useEffect(() => {
@@ -36,6 +43,28 @@ const Listing = () => {
   return (
     <main>
       {/* slide show */}
+      <Swiper
+        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        // spaceBetween={50}
+        // navigation
+        slidesPerView={1}
+        scrollbar={{ draggable: true }}
+        pagination={{ clickable: true }}
+      >
+        {listing.imageUrls.map((url, index) => (
+          <SwiperSlide key={index}>
+            <div
+              className="swiperSlideDiv"
+              style={{
+                background: `url(${listing.imageUrls[index]}) center no-repeat`,
+                backgroundSize: 'cover',
+                height: '300px',
+              }}
+            ></div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
       <div
         className="shareIconDiv"
         onClick={() => {
