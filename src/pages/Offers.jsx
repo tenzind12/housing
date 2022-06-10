@@ -10,6 +10,9 @@ const Offers = () => {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // for loadmore of listing
+  const [lastFetchedListing, setLastFetchedListing] = useState(null);
+
   const params = useParams();
 
   useEffect(() => {
@@ -23,11 +26,15 @@ const Offers = () => {
           listingsRef,
           where('offer', '==', true),
           orderBy('timestamp', 'desc'),
-          limit(10)
+          limit(5)
         );
 
         // execute the query (q)
         const querySnap = await getDocs(q);
+
+        // limit(5) so, last visible is the 5th listing
+        const lastVisible = querySnap.docs[querySnap.docs.length - 1];
+        setLastFetchedListing(lastVisible);
 
         const listings = [];
         querySnap.forEach((doc) =>
@@ -45,9 +52,43 @@ const Offers = () => {
     })();
   }, [params.categoryName]);
 
-  useEffect(() => {
-    console.log(listings);
-  }, [listings]);
+  // Pagination / Load more
+  const onFetchMoreListings = async () => {
+    try {
+      // Get reference
+      const listingsRef = collection(db, 'listings');
+
+      // create a query
+      const q = query(
+        listingsRef,
+        where('offer', '==', true),
+        orderBy('timestamp', 'desc'),
+        startAfter(lastFetchedListing),
+        limit(5)
+      );
+
+      // execute the query (q)
+      const querySnap = await getDocs(q);
+
+      // limit(5) so, last visible is the 5th listing
+      const lastVisible = querySnap.docs[querySnap.docs.length - 1];
+      setLastFetchedListing(lastVisible);
+
+      const listings = [];
+      querySnap.forEach((doc) =>
+        listings.push({
+          id: doc.id,
+          data: doc.data(),
+        })
+      );
+
+      // push new listing to the prev listings
+      setListings((prevState) => [...prevState, ...listings]);
+      setLoading(false);
+    } catch (error) {
+      toast.error('Could not fetch data');
+    }
+  };
 
   return (
     <div className="category">
@@ -58,13 +99,24 @@ const Offers = () => {
       {loading ? (
         <Spinner />
       ) : listings && listings.length > 0 ? (
-        <main>
-          <ul className="categoryListings">
-            {listings.map((listing) => {
-              return <ListingItem listing={listing.data} id={listing.id} key={listing.id} />;
-            })}
-          </ul>
-        </main>
+        <>
+          <main>
+            <ul className="categoryListings">
+              {listings.map((listing) => {
+                return <ListingItem listing={listing.data} id={listing.id} key={listing.id} />;
+              })}
+            </ul>
+          </main>
+          <br />
+          <br />
+
+          {/* load more link button */}
+          {lastFetchedListing && (
+            <p className="loadMore" onClick={onFetchMoreListings}>
+              Load More
+            </p>
+          )}
+        </>
       ) : (
         <p>There are no current offers</p>
       )}
