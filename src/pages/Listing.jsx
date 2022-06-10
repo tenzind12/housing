@@ -17,6 +17,7 @@ const Listing = () => {
 
   // Fetching data from firestore
   useEffect(() => {
+    // fetch listings with landlordId
     (async () => {
       const docRef = doc(db, 'listings', params.listingId);
       const docSnap = await getDoc(docRef);
@@ -77,9 +78,10 @@ const Listing = () => {
 
         {/* map */}
 
+        {/* If user is not landlord, show contact link button */}
         {auth.currentUser?.uid !== listing.userRef && (
           <Link
-            to={`/contact/${listing.userRef}?listingName=${listing.name}&listingLocation=${listing.location}`}
+            to={`/contact/${listing.userRef}?listingName=${listing.name}`}
             className="primaryButton"
           >
             Contact Landlord

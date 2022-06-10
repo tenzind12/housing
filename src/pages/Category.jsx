@@ -45,10 +45,6 @@ const Category = () => {
     })();
   }, [params.categoryName]);
 
-  useEffect(() => {
-    console.log(listings);
-  }, [listings]);
-
   return (
     <div className="category">
       <header>
