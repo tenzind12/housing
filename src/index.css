@@ -93,10 +93,15 @@ button {
 .offers,
 .profile,
 .listingDetails,
-.category,
-.explore {
+.category {
   margin: 1rem;
 }
+
+.explore {
+  max-width: 705px;
+  margin: auto;
+}
+
 @media (min-width: 1024px) {
   .offers,
   .profile,
