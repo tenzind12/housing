@@ -106,8 +106,7 @@ button {
   .offers,
   .profile,
   .listingDetails,
-  .category,
-  .explore {
+  .category {
     margin: 3rem;
   }
 }
